@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Library Management System</title>
+
+<style>
+  :root {
+    --bg-color: #f7f9fc;
+    --text-color: #333;
+    --primary-color: #2563eb;
+    --primary-hover: #1e40af;
+    --surface-color: #fff;
+    --surface-alt: #f3f4f6;
+    --error-color: #dc2626;
+    --table-header-bg: #f3f4f6;
+    --table-row-hover: #e0e7ff;
+  }
+
+  [data-theme="dark"] {
+    --bg-color: #121212;
+    --text-color: #ddd;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --surface-color: #1e1e1e;
+    --surface-alt: #2a2a2a;
+    --error-color: #ef4444;
+    --table-header-bg: #2a2a2a;
+    --table-row-hover: #3a3a3a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 20px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+  }
+  h2 {
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--surface-alt);
+    padding-bottom: 0.5rem;
+    color: var(--text-color);
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    background: var(--surface-color);
+    border-radius: 8px;
+    padding: 2rem 3rem;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    transition: background-color 0.3s;
+  }
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+  }
+  input[type="text"],
+  input[type="number"],
+  input[type="file"],
+  select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccd7e0;
+    border-radius: 5px;
+    font-size: 1rem;
+    background: var(--surface-alt);
+    color: var(--text-color);
+    transition: border-color 0.3s;
+  }
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  input[type="file"]:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(37, 99, 235, 0.4);
+  }
+
+  button {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  button:hover {
+    background: var(--primary-hover);
+  }
+  button:disabled {
+    background: #a5b4fc;
+    cursor: not-allowed;
+  }
+  button.small {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+  button.danger {
+    background: #dc2626;
+  }
+  button.danger:hover {
+    background: #991b1b;
+  }
+
+  .flex-row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .flex-column {
+    flex: 1 1 320px;
+  }
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+  }
+  thead {
+    background-color: var(--table-header-bg);
+    color: var(--primary-color);
+    font-weight: 700;
+  }
+  tbody tr:nth-child(odd) {
+    background-color: var(--surface-alt);
+  }
+  tbody tr:hover {
+    background-color: var(--table-row-hover);
+  }
+
+  .error {
+    color: var(--error-color);
+    font-weight: 600;
+    min-height: 1.25rem;
+    margin-top: -0.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .backup-section {
+    text-align: center;
+  }
+  .backup-section button,
+  .backup-section input[type="file"] {
+    margin: 0.5rem 0.8rem;
+    font-size: 1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .flex-row {
+      flex-direction: column;
+    }
+    .container {
+      padding: 1.5rem 1.5rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+    }
+  }
+
+  /* Dark mode toggle button */
+  #darkModeToggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: var(--primary-color);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: background-color 0.3s;
+    z-index: 1000;
+  }
+  #darkModeToggle:hover {
+    background: var(--primary-hover);
+  }
+
+  /* Advanced Search Styles */
+  .filter-group {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+  .filter-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .filter-row > * {
+    flex: 1 1 140px;
+  }
+</style>
+</head>
+<body>
+
+<button id="darkModeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+
+<div class="container">
+  <h1>Library Management System</h1>
+
+  <!-- Book Management -->
+  <section class="section" aria-label="Book Management">
+    <h2>Book Management</h2>
+    <div class="flex-row">
+      <div class="flex-column" style="max-width: 350px;">
+        <label for="bookTitle">Title</label>
+        <input id="bookTitle" type="text" autocomplete="off" />
+        <label for="bookAuthor">Author</label>
+        <input id="bookAuthor" type="text" autocomplete="off" />
+        <label for="bookISBN">ISBN</label>
+        <input id="bookISBN" type="text" autocomplete="off" />
+        <label for="bookYear">Publication Year</label>
+        <input id="bookYear" type="number" min="1000" max="9999" />
+        <button class="small" onclick="addBook()">➕ Add Book</button>
+        <button class="small" onclick="removeBook()">🗑️ Remove Book</button>
+        <div id="bookMessage" class="error" aria-live="polite"></div>
+      </div>
+      <div class="flex-column table-wrapper">
+        <div class="filter-group">Advanced Filters:</div>
+        <div class="filter-row">
+          <input id="bookFilterTitle" type="text" placeholder="Filter Title" oninput="displayBooksWithFilters()" autocomplete="off" />
+          <input id="bookFilterAuthor" type="text" placeholder="Filter Author" oninput="displayBooksWithFilters()" autocomplete="off" />
+          <input id="bookFilterISBN" type="text" placeholder="Filter ISBN" oninput="displayBooksWithFilters()" autocomplete="off" />
+          <select id="bookFilterStatus" onchange="displayBooksWithFilters()">
+            <option value="">All Status</option>
+            <option value="Available">Available</option>
+            <option value="Loaned Out">Loaned Out</option>
+          </select>
+        </div>
+        <table id="booksTable" aria-label="Books Table">
+          <thead>
+            <tr><th>Title</th><th>Author</th><th>ISBN</th><th>Year</th><th>Status</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Borrower Management -->
+  <section class="section" aria-label="Borrower Management">
+    <h2>Borrower Management</h2>
+    <div class="flex-row">
+      <div class="flex-column" style="max-width: 350px;">
+        <label for="borrowerName">Name</label>
+        <input id="borrowerName" type="text" autocomplete="off" />
+        <label for="borrowerID">ID</label>
+        <input id="borrowerID" type="text" autocomplete="off" />
+        <label for="borrowerContact">Contact Info</label>
+        <input id="borrowerContact" type="text" autocomplete="off" />
+        <button class="small" onclick="addBorrower()">➕ Add Borrower</button>
+        <button class="small" onclick="removeBorrower()">🗑️ Remove Borrower</button>
+        <div id="borrowerMessage" class="error" aria-live="polite"></div>
+      </div>
+      <div class="flex-column table-wrapper">
+        <div class="filter-group">Advanced Filters:</div>
+        <div class="filter-row">
+          <input id="borrowerFilterName" type="text" placeholder="Filter Name" oninput="displayBorrowersWithFilters()" autocomplete="off" />
+          <input id="borrowerFilterID" type="text" placeholder="Filter ID" oninput="displayBorrowersWithFilters()" autocomplete="off" />
+          <input id="borrowerFilterContact" type="text" placeholder="Filter Contact" oninput="displayBorrowersWithFilters()" autocomplete="off" />
+        </div>
+        <table id="borrowersTable" aria-label="Borrowers Table">
+          <thead>
+            <tr><th>Name</th><th>ID</th><th>Contact</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loan Management -->
+  <section class="section" aria-label="Loan Management">
+    <h2>Loan Management</h2>
+    <div class="flex-row">
+      <div class="flex-column" style="max-width: 350px;">
+        <label for="loanISBN">Book ISBN</label>
+        <input id="loanISBN" type="text" autocomplete="off" />
+        <label for="loanBorrowerID">Borrower ID</label>
+        <input id="loanBorrowerID" type="text" autocomplete="off" />
+        <button class="small" onclick="borrowBook()">📚 Borrow Book</button>
+
+        <label for="returnISBN">Return Book ISBN</label>
+        <input id="returnISBN" type="text" autocomplete="off" />
+        <button class="small" onclick="returnBook()">↩️ Return Book</button>
+        <div id="loanMessage" class="error" aria-live="polite"></div>
+      </div>
+      <div class="flex-column table-wrapper">
+        <div class="filter-group">Advanced Filters:</div>
+        <div class="filter-row">
+          <input id="loanFilterBook" type="text" placeholder="Filter by Book Title" oninput="displayLoansWithFilters()" autocomplete="off" />
+          <input id="loanFilterBorrower" type="text" placeholder="Filter by Borrower Name" oninput="displayLoansWithFilters()" autocomplete="off" />
+          <select id="loanFilterOverdue" onchange="displayLoansWithFilters()">
+            <option value="">All Loans</option>
+            <option value="overdue">Only Overdue</option>
+            <option value="notoverdue">Not Overdue</option>
+          </select>
+        </div>
+        <h3>Active Loans</h3>
+        <table id="loansTable" aria-label="Active Loans Table">
+          <thead>
+            <tr><th>Book Title</th><th>Borrower</th><th>Borrow Date</th><th>Overdue Days</th><th>Fine (RM)</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Report -->
+  <section class="section" aria-label="Library Report">
+    <h2>Library Report</h2>
+    <p id="reportText" style="font-weight:600; font-size:1.05rem;"></p>
+    <button onclick="generateReport()">📊 Generate Report</button>
+  </section>
+
+  <!-- Backup & Restore -->
+  <section class="section backup-section" aria-label="Backup and Restore Data">
+    <h2>Backup & Restore Data</h2>
+    <button class="danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+    <button onclick="exportData()">⬇️ Export Backup</button>
+    <input type="file" id="importFile" accept=".json" aria-label="Import backup file" onchange="importData(event)" />
+  </section>
+</div>
+
+<script>
+  // Dark mode toggle
+  const toggleBtn = document.getElementById('darkModeToggle');
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  toggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+  toggleBtn.onclick = () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    if(current === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      toggleBtn.textContent = '🌙';
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      toggleBtn.textContent = '☀️';
+      localStorage.setItem('theme', 'dark');
+    }
+  };
+
+  // Data arrays
+  let books = JSON.parse(localStorage.getItem('books') || '[]');
+  let borrowers = JSON.parse(localStorage.getItem('borrowers') || '[]');
+  let loans = JSON.parse(localStorage.getItem('loans') || '[]');
+
+  function saveData() {
+    localStorage.setItem('books', JSON.stringify(books));
+    localStorage.setItem('borrowers', JSON.stringify(borrowers));
+    localStorage.setItem('loans', JSON.stringify(loans));
+  }
+
+  function showMessage(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    setTimeout(() => el.textContent = '', 4000);
+  }
+
+  function findBookByISBN(isbn) {
+    return books.find(b => b.isbn === isbn);
+  }
+
+  function findBorrowerByID(id) {
+    return borrowers.find(b => b.id === id);
+  }
+
+  function isBookLoaned(isbn) {
+    return loans.some(loan => loan.isbn === isbn && !loan.returnDate);
+  }
+
+  function addBook() {
+    const title = document.getElementById('bookTitle').value.trim();
+    const author = document.getElementById('bookAuthor').value.trim();
+    const isbn = document.getElementById('bookISBN').value.trim();
+    const year = parseInt(document.getElementById('bookYear').value);
+
+    if (!title || !author || !isbn || !year) {
+      showMessage('bookMessage', 'All book fields are required.');
+      return;
+    }
+    if (findBookByISBN(isbn)) {
+      showMessage('bookMessage', 'ISBN must be unique.');
+      return;
+    }
+    books.push({title, author, isbn, year});
+    saveData();
+    clearBookInputs();
+    showMessage('bookMessage', 'Book added successfully.');
+    displayBooksWithFilters();
+  }
+
+  function removeBook() {
+    const isbn = document.getElementById('bookISBN').value.trim();
+    if (!isbn) {
+      showMessage('bookMessage', 'Enter ISBN to remove.');
+      return;
+    }
+    if (isBookLoaned(isbn)) {
+      showMessage('bookMessage', 'Cannot remove: Book is currently loaned.');
+      return;
+    }
+    const idx = books.findIndex(b => b.isbn === isbn);
+    if (idx === -1) {
+      showMessage('bookMessage', 'Book not found.');
+      return;
+    }
+    books.splice(idx, 1);
+    saveData();
+    clearBookInputs();
+    showMessage('bookMessage', 'Book removed successfully.');
+    displayBooksWithFilters();
+  }
+
+  function clearBookInputs() {
+    ['bookTitle','bookAuthor','bookISBN','bookYear'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  function addBorrower() {
+    const name = document.getElementById('borrowerName').value.trim();
+    const id = document.getElementById('borrowerID').value.trim();
+    const contact = document.getElementById('borrowerContact').value.trim();
+
+    if (!name || !id || !contact) {
+      showMessage('borrowerMessage', 'All borrower fields are required.');
+      return;
+    }
+    if (findBorrowerByID(id)) {
+      showMessage('borrowerMessage', 'Borrower ID must be unique.');
+      return;
+    }
+    borrowers.push({name, id, contact});
+    saveData();
+    clearBorrowerInputs();
+    showMessage('borrowerMessage', 'Borrower added successfully.');
+    displayBorrowersWithFilters();
+  }
+
+  function removeBorrower() {
+    const id = document.getElementById('borrowerID').value.trim();
+    if (!id) {
+      showMessage('borrowerMessage', 'Enter Borrower ID to remove.');
+      return;
+    }
+    const hasLoan = loans.some(loan => loan.borrowerId === id && !loan.returnDate);
+    if (hasLoan) {
+      showMessage('borrowerMessage', 'Cannot remove: Borrower has active loans.');
+      return;
+    }
+    const idx = borrowers.findIndex(b => b.id === id);
+    if (idx === -1) {
+      showMessage('borrowerMessage', 'Borrower not found.');
+      return;
+    }
+    borrowers.splice(idx, 1);
+    saveData();
+    clearBorrowerInputs();
+    showMessage('borrowerMessage', 'Borrower removed successfully.');
+    displayBorrowersWithFilters();
+  }
+
+  function clearBorrowerInputs() {
+    ['borrowerName','borrowerID','borrowerContact'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  function borrowBook() {
+    const isbn = document.getElementById('loanISBN').value.trim();
+    const borrowerId = document.getElementById('loanBorrowerID').value.trim();
+
+    if (!isbn || !borrowerId) {
+      showMessage('loanMessage', 'ISBN and Borrower ID are required.');
+      return;
+    }
+    if (!findBookByISBN(isbn)) {
+      showMessage('loanMessage', 'Book ISBN not found.');
+      return;
+    }
+    if (!findBorrowerByID(borrowerId)) {
+      showMessage('loanMessage', 'Borrower ID not found.');
+      return;
+    }
+    if (isBookLoaned(isbn)) {
+      showMessage('loanMessage', 'Book is already loaned.');
+      return;
+    }
+    loans.push({isbn, borrowerId, borrowDate: new Date().toISOString(), returnDate: null});
+    saveData();
+    clearLoanInputs();
+    showMessage('loanMessage', 'Book borrowed successfully.');
+    displayLoansWithFilters();
+    displayBooksWithFilters();
+  }
+
+  function returnBook() {
+    const isbn = document.getElementById('returnISBN').value.trim();
+    if (!isbn) {
+      showMessage('loanMessage', 'Enter ISBN to return.');
+      return;
+    }
+    const loan = loans.find(l => l.isbn === isbn && !l.returnDate);
+    if (!loan) {
+      showMessage('loanMessage', 'No active loan found for this ISBN.');
+      return;
+    }
+    loan.returnDate = new Date().toISOString();
+    saveData();
+    clearLoanInputs();
+    showMessage('loanMessage', 'Book returned successfully.');
+    displayLoansWithFilters();
+    displayBooksWithFilters();
+  }
+
+  function clearLoanInputs() {
+    ['loanISBN', 'loanBorrowerID', 'returnISBN'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  function displayBooksWithFilters() {
+    const tbody = document.querySelector('#booksTable tbody');
+    tbody.innerHTML = '';
+
+    const filterTitle = document.getElementById('bookFilterTitle').value.toLowerCase();
+    const filterAuthor = document.getElementById('bookFilterAuthor').value.toLowerCase();
+    const filterISBN = document.getElementById('bookFilterISBN').value.toLowerCase();
+    const filterStatus = document.getElementById('bookFilterStatus').value;
+
+    books.forEach(book => {
+      if (
+        book.title.toLowerCase().includes(filterTitle) &&
+        book.author.toLowerCase().includes(filterAuthor) &&
+        book.isbn.toLowerCase().includes(filterISBN)
+      ) {
+        const status = isBookLoaned(book.isbn) ? 'Loaned Out' : 'Available';
+        if (!filterStatus || filterStatus === status) {
+          const tr = `<tr>
+            <td>${book.title}</td><td>${book.author}</td><td>${book.isbn}</td><td>${book.year}</td><td>${status}</td>
+          </tr>`;
+          tbody.insertAdjacentHTML('beforeend', tr);
+        }
+      }
+    });
+  }
+
+  function displayBorrowersWithFilters() {
+    const tbody = document.querySelector('#borrowersTable tbody');
+    tbody.innerHTML = '';
+
+    const filterName = document.getElementById('borrowerFilterName').value.toLowerCase();
+    const filterID = document.getElementById('borrowerFilterID').value.toLowerCase();
+    const filterContact = document.getElementById('borrowerFilterContact').value.toLowerCase();
+
+    borrowers.forEach(b => {
+      if (
+        b.name.toLowerCase().includes(filterName) &&
+        b.id.toLowerCase().includes(filterID) &&
+        b.contact.toLowerCase().includes(filterContact)
+      ) {
+        const tr = `<tr><td>${b.name}</td><td>${b.id}</td><td>${b.contact}</td></tr>`;
+        tbody.insertAdjacentHTML('beforeend', tr);
+      }
+    });
+  }
+
+  function displayLoansWithFilters() {
+    const tbody = document.querySelector('#loansTable tbody');
+    tbody.innerHTML = '';
+
+    const filterBook = document.getElementById('loanFilterBook').value.toLowerCase();
+    const filterBorrower = document.getElementById('loanFilterBorrower').value.toLowerCase();
+    const filterOverdue = document.getElementById('loanFilterOverdue').value;
+
+    loans.filter(l => !l.returnDate).forEach(loan => {
+      const book = findBookByISBN(loan.isbn);
+      const borrower = findBorrowerByID(loan.borrowerId);
+      const borrowDate = new Date(loan.borrowDate);
+      const today = new Date();
+      const diffDays = Math.floor((today - borrowDate)/(1000*60*60*24));
+      const overdue = diffDays > 14 ? diffDays - 14 : 0;
+      const fine = overdue;
+
+      if (
+        (book && book.title.toLowerCase().includes(filterBook)) &&
+        (borrower && borrower.name.toLowerCase().includes(filterBorrower))
+      ) {
+        if (
+          filterOverdue === '' ||
+          (filterOverdue === 'overdue' && overdue > 0) ||
+          (filterOverdue === 'notoverdue' && overdue === 0)
+        ) {
+          const tr = `<tr>
+            <td>${book ? book.title : loan.isbn}</td>
+            <td>${borrower ? borrower.name : loan.borrowerId}</td>
+            <td>${borrowDate.toISOString().slice(0,10)}</td>
+            <td>${overdue}</td>
+            <td>RM${fine}</td>
+          </tr>`;
+          tbody.insertAdjacentHTML('beforeend', tr);
+        }
+      }
+    });
+  }
+
+  function generateReport() {
+    const totalBooks = books.length;
+    const totalBorrowers = borrowers.length;
+    const totalOverdue = loans.filter(l => {
+      if (l.returnDate) return false;
+      const borrowDate = new Date(l.borrowDate);
+      const diffDays = Math.floor((new Date() - borrowDate)/(1000*60*60*24));
+      return diffDays > 14;
+    }).length;
+    document.getElementById('reportText').textContent = 
+      `Total Books: ${totalBooks}, Total Borrowers: ${totalBorrowers}, Overdue Loans: ${totalOverdue}`;
+  }
+
+  function clearAllData() {
+    if (confirm('Are you sure you want to clear ALL data? This action cannot be undone.')) {
+      books = [];
+      borrowers = [];
+      loans = [];
+      saveData();
+      displayBooksWithFilters();
+      displayBorrowersWithFilters();
+      displayLoansWithFilters();
+      document.getElementById('reportText').textContent = '';
+      showMessage('bookMessage', 'All data cleared.');
+    }
+  }
+
+  function exportData() {
+    const data = {books, borrowers, loans};
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'library_backup_' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.books && data.borrowers && data.loans) {
+          books = data.books;
+          borrowers = data.borrowers;
+          loans = data.loans;
+          saveData();
+          displayBooksWithFilters();
+          displayBorrowersWithFilters();
+          displayLoansWithFilters();
+          showMessage('bookMessage', 'Data imported successfully.');
+        } else {
+          alert('Invalid backup file format.');
+        }
+      } catch (error) {
+        alert('Error reading backup file: ' + error.message);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+  }
+
+  // Initial display
+  displayBooksWithFilters();
+  displayBorrowersWithFilters();
+  displayLoansWithFilters();
+</script>
+
+<script>
+  // Register service worker for PWA offline caching
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registered:', reg.scope))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
+
+</body>
+</html>
