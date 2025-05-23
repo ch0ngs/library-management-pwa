@@ -9,8 +9,8 @@
   :root {
     --bg-color: #f7f9fc;
     --text-color: #333;
-    --primary-color: #6c757d; /* changed from blue to grey */
-    --primary-hover: #5a6268; /* darker grey */
+    --primary-color: #6c757d;    /* grey */
+    --primary-hover: #5a6268;    /* darker grey */
     --surface-color: #fff;
     --surface-alt: #f3f4f6;
     --error-color: #dc2626;
@@ -21,8 +21,8 @@
   [data-theme="dark"] {
     --bg-color: #121212;
     --text-color: #ddd;
-    --primary-color: #6c757d; /* grey */
-    --primary-hover: #5a6268;
+    --primary-color: #6c757d;   /* grey */
+    --primary-hover: #5a6268;   /* darker grey */
     --surface-color: #1e1e1e;
     --surface-alt: #2a2a2a;
     --error-color: #ef4444;
@@ -109,9 +109,7 @@
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    margin-right: 12px;      /* horizontal space */
-    margin-bottom: 12px;     /* vertical space */
+    gap: 6px;
     transition: background-color 0.25s ease;
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
   }
@@ -145,6 +143,19 @@
   button.small {
     padding: 8px 14px;
     font-size: 0.9rem;
+  }
+
+  /* New: Button groups for spacing */
+  .button-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* For Borrower buttons: no wrap to keep side by side */
+  .button-group.no-wrap {
+    flex-wrap: nowrap;
   }
 
   .flex-row {
@@ -273,8 +284,10 @@
         <input id="bookISBN" type="text" autocomplete="off" />
         <label for="bookYear">Publication Year</label>
         <input id="bookYear" type="number" min="1000" max="9999" />
-        <button class="small primary" onclick="addBook()">➕ Add Book</button>
-        <button class="small secondary" onclick="removeBook()">🗑️ Remove Book</button>
+        <div class="button-group">
+          <button class="small primary" onclick="addBook()">➕ Add Book</button>
+          <button class="small secondary" onclick="removeBook()">🗑️ Remove Book</button>
+        </div>
         <div id="bookMessage" class="error" aria-live="polite"></div>
       </div>
       <div class="flex-column table-wrapper">
@@ -310,8 +323,12 @@
         <input id="borrowerID" type="text" autocomplete="off" />
         <label for="borrowerContact">Contact Info</label>
         <input id="borrowerContact" type="text" autocomplete="off" />
-        <button class="small primary" onclick="addBorrower()">➕ Add Borrower</button>
-        <button class="small secondary" onclick="removeBorrower()">🗑️ Remove Borrower</button>
+
+        <div class="button-group no-wrap">
+          <button class="small primary" onclick="addBorrower()">➕ Add Borrower</button>
+          <button class="small secondary" onclick="removeBorrower()">🗑️ Remove Borrower</button>
+        </div>
+
         <div id="borrowerMessage" class="error" aria-live="polite"></div>
       </div>
       <div class="flex-column table-wrapper">
@@ -340,10 +357,12 @@
         <input id="loanISBN" type="text" autocomplete="off" />
         <label for="loanBorrowerID">Borrower ID</label>
         <input id="loanBorrowerID" type="text" autocomplete="off" />
-        <button class="small primary" onclick="borrowBook()">📚 Borrow Book</button>
+        <div class="button-group">
+          <button class="small primary" onclick="borrowBook()">📚 Borrow Book</button>
+          <button class="small secondary" onclick="returnBook()">↩️ Return Book</button>
+        </div>
         <label for="returnISBN">Return Book ISBN</label>
         <input id="returnISBN" type="text" autocomplete="off" />
-        <button class="small secondary" onclick="returnBook()">↩️ Return Book</button>
         <div id="loanMessage" class="error" aria-live="polite"></div>
       </div>
       <div class="flex-column table-wrapper">
